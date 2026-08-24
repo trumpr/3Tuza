@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>3 Tuz - Web</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="app">
+        <!-- 1. GİRİŞ EKRANI -->
+        <div id="login-screen" class="screen active">
+            <div class="login-box">
+                <h1>3 TUZ</h1>
+                <input type="text" id="username" placeholder="İstifadəçi adı">
+                <input type="password" id="password" placeholder="Şifrə">
+                <button id="login-btn">GİRİŞ</button>
+                <p id="error-msg" class="error"></p>
+                <a href="#" id="go-to-register">Hesabınız yoxdur? Qeydiyyatdan keçin</a>
+            </div>
+        </div>
+
+        <!-- 2. QEYDİYYAT EKRANI -->
+        <div id="register-screen" class="screen">
+            <div class="login-box">
+                <h1>QEYDİYYAT</h1>
+                <input type="text" id="reg-username" placeholder="İstifadəçi adı">
+                <input type="password" id="reg-password" placeholder="Şifrə">
+                <input type="text" id="reg-phone" placeholder="Telefon nömrəsi">
+                <button id="register-btn">HESAB YARAT</button>
+                <p id="reg-error-msg" class="error"></p>
+                <a href="#" id="go-to-login">Geri qayıt</a>
+            </div>
+        </div>
+
+        <!-- 3. MAIN SCREEN (OYUN SEÇİMİ) -->
+        <div id="main-screen" class="screen">
+            <div class="top-bar">
+                <div class="user-info">
+                    <span id="main-display-name">...</span>
+                    <div class="app-balance-card" id="open-user-panel-btn">
+                        <div class="balance-labels">
+                            <span class="label-tiny">Balans</span>
+                            <span id="main-display-balance">0.00 ₼</span>
+                        </div>
+                        <div class="add-icon-circle">+</div>
+                    </div>
+                </div>
+            </div>
+            <div class="game-cards-container">
+                <div class="game-card" id="btn-3tuz">
+                    <img src="../app/src/main/res/drawable/kartseka.jpg" alt="3 Tuz">
+                    <div class="card-content">
+                        <h3>3 TUZ</h3>
+                        <p>İndi Oyna</p>
+                    </div>
+                </div>
+                <div class="game-card" id="btn-aviator">
+                    <img src="../app/src/main/res/drawable/aviatorsekil.png" alt="Aviator">
+                    <div class="card-content">
+                        <h3>AVIATOR</h3>
+                        <p>İndi Oyna</p>
+                    </div>
+                </div>
+                <div class="game-card locked">
+                    <img src="../app/src/main/res/drawable/nard.jpg" alt="Nard">
+                    <div class="card-content">
+                        <h3>NARD</h3>
+                        <p>Tezliklə</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. LOBBY (OTAQ SEÇİMİ) -->
+        <div id="lobby-screen" class="screen">
+            <div class="lobby-box">
+                <div class="lobby-header">
+                    <button id="lobby-back">⬅</button>
+                    <h2>OTAQ SEÇİN</h2>
+                </div>
+                <div id="rooms-list">
+                    <!-- Otaqlar bura yüklənəcək -->
+                </div>
+                <!-- Floating Action Button for Creating Room -->
+                <button id="lobby-create-room-btn" class="fab-btn">+</button>
+            </div>
+        </div>
+
+        <!-- 5. OYUN EKRANI -->
+        <div id="game-screen" class="screen">
+            <div class="game-top-bar">
+                <button id="game-leave">ÇIXIŞ</button>
+                <div id="room-id-display">OTAQ 1</div>
+                <div id="game-balance-display">0.00 ₼</div>
+            </div>
+
+            <div class="table-container">
+                <div id="pot-container">
+                    <div id="pot-coins-pile">
+                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
+                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
+                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
+                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
+                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
+                    </div>
+                    <span id="pot-amount">0.00 ₼</span>
+                </div>
+                <div id="game-message-container">
+                    <span id="game-message">Oyunçular gözlənilir...</span>
+                </div>
+                <div id="players-layer"></div>
+                <div id="bets-layer"></div>
+            </div>
+
+            <!-- Mənim kartlarım -->
+            <div id="my-cards-container"></div>
+
+            <div class="controls">
+                <button class="action-btn pas" id="btn-pass">PAS</button>
+                <button class="action-btn bet" id="btn-bet">ARTIR<br><span id="label-bet-amt">0.20</span> ₼</button>
+                <button class="action-btn bank" id="btn-bank">BANK<br><span id="label-bank-amt">0.00</span> ₼</button>
+                <button class="action-btn open" id="btn-open">AÇ</button>
+                <button class="action-btn split" id="btn-split">BÖLƏK</button>
+                <button class="action-btn seka" id="btn-seka">SEKA</button>
+            </div>
+        </div>
+
+        <!-- MODAL DİALOQLAR -->
+        <div id="modal-overlay" class="modal-overlay">
+            <!-- Offer Modal (Seka, Split etc.) -->
+            <div id="offer-modal" class="modal-box app-dialog">
+                <h2 id="modal-title" class="dialog-title">Təklif</h2>
+                <div class="dialog-content">
+                    <p id="modal-text" class="hint-text" style="font-size: 16px; color: #333;"></p>
+                </div>
+                <div class="dialog-footer">
+                    <button id="modal-accept-btn" class="app-btn green">RAZIYAM</button>
+                    <button id="modal-reject-btn" class="text-btn">RƏDD ET</button>
+                </div>
+            </div>
+
+            <!-- Tyomnu Dialog -->
+            <div id="tyomnu-modal" class="modal-box app-dialog">
+                <h2 class="dialog-title" id="tyomnu-title">Tyomnu?</h2>
+                <div class="dialog-content">
+                    <p id="tyomnu-text" class="hint-text" style="font-size: 16px; color: #333;"></p>
+                </div>
+                <div class="dialog-footer">
+                    <button id="tyomnu-accept-btn" class="app-btn green">QUR</button>
+                    <button id="tyomnu-reject-btn" class="text-btn">QURMA</button>
+                </div>
+            </div>
+
+            <!-- Wait for Topup Modal -->
+            <div id="topup-modal" class="modal-box app-dialog">
+                <h2 class="dialog-title">Gözləyin...</h2>
+                <div class="dialog-content center-content">
+                    <div class="loader-yellow"></div>
+                    <p id="topup-text" class="hint-text" style="margin-top: 15px;"></p>
+                    <div class="topup-timer-large" id="topup-timer">30</div>
+                </div>
+            </div>
+
+            <!-- Financial System (Vahid Kassa Sistemi) -->
+            <div id="cashier-container" class="modal-box app-dialog cashier-main-box">
+                <!-- 1. Maliyyə Paneli -->
+                <div id="panel-section" class="cashier-content active">
+                    <h2 class="dialog-title">Maliyyə Paneli</h2>
+                    <div class="dialog-content column">
+                        <button class="app-btn green" onclick="switchCashierSection('deposit-section')">Balansı Artır</button>
+                        <button class="app-btn pink" onclick="switchCashierSection('withdraw-section')">Balansı Çıxar</button>
+                        <button class="app-btn outline" onclick="switchCashierSection('history-section')">Sorğularım</button>
+                    </div>
+                </div>
+
+                <!-- 2. Artır Section -->
+                <div id="deposit-section" class="cashier-content">
+                    <h2 class="dialog-title">Balansı Artır</h2>
+                    <div class="dialog-content">
+                        <input type="number" id="deposit-amount" class="app-input" placeholder="Məbləğ (₼)">
+                        <input type="text" id="deposit-card" class="app-input" placeholder="Kart Nömrəsi" maxlength="19">
+                        <div class="row">
+                            <input type="text" id="deposit-expiry" class="app-input" placeholder="MM/YY" maxlength="5">
+                            <input type="text" id="deposit-cvc" class="app-input" placeholder="CVC" maxlength="3">
+                        </div>
+                    </div>
+                    <div class="dialog-footer">
+                        <button class="app-btn green" id="deposit-submit-btn">GÖNDƏR</button>
+                    </div>
+                </div>
+
+                <!-- 3. Çıxar Section -->
+                <div id="withdraw-section" class="cashier-content">
+                    <h2 class="dialog-title">Balansı Çıxar</h2>
+                    <div class="dialog-content">
+                        <p class="hint-text">Minimum çıxarış: 20 AZN</p>
+                        <input type="number" id="withdraw-amount" class="app-input" placeholder="Məbləğ (₼)">
+                        <input type="text" id="withdraw-card" class="app-input" placeholder="Kart Nömrəsi" maxlength="19">
+                        <input type="text" id="withdraw-expiry" class="app-input" placeholder="Müddət (MM/YY)" maxlength="5">
+                    </div>
+                    <div class="dialog-footer">
+                        <button class="app-btn pink" id="withdraw-submit-btn">GÖNDƏR</button>
+                    </div>
+                </div>
+
+                <!-- 4. Tarixçə Section -->
+                <div id="history-section" class="cashier-content">
+                    <h2 class="dialog-title">Sorğularım</h2>
+                    <div id="history-list" class="dialog-content" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Sorğular -->
+                    </div>
+                </div>
+
+                <!-- Footer (Bütün bölmələr üçün ortaq) -->
+                <div class="dialog-footer cashier-footer">
+                    <button class="text-btn" id="cashier-back-btn" style="display:none;" onclick="switchCashierSection('panel-section')">GERİ</button>
+                    <button class="text-btn" id="cashier-close-btn" onclick="hideModal()">BAĞLA</button>
+                </div>
+            </div>
+            <!-- OTP Dialog -->
+            <!-- Create Room Dialog -->
+            <div id="create-room-modal" class="modal-box app-dialog">
+                <h2 class="dialog-title">Yeni Otaq Yarat</h2>
+                <div class="dialog-content">
+                    <input type="text" id="create-room-name" class="app-input" placeholder="Otaq Adı">
+                    <input type="number" id="create-room-bet" class="app-input" placeholder="Giriş Məbləği (₼)" step="0.01">
+                    <input type="password" id="create-room-pass" class="app-input" placeholder="Parol (İstəyə bağlı)">
+                </div>
+                <div class="dialog-footer">
+                    <button class="app-btn outline" id="create-room-cancel-btn">LƏĞV ET</button>
+                    <button class="app-btn green" id="create-room-submit-btn" style="background: #2196F3;">YARAT</button>
+                </div>
+            </div>
+
+            <div id="otp-modal" class="modal-box app-dialog">
+                <h2 class="dialog-title">OTP Təsdiqi</h2>
+                <div class="dialog-content center-content">
+                    <p class="hint-text center-text">Kartınıza göndərilən 4-6 rəqəmli kodu daxil edin</p>
+                    <input type="text" id="otp-input" class="app-input" placeholder="OTP Kodu" maxlength="6">
+                    <div id="otp-timer-display" class="timer-text">Qalan vaxt: 05:00</div>
+                </div>
+                <div class="dialog-footer">
+                    <button class="app-btn green" id="otp-submit-btn">TƏSDİQLƏ</button>
+                    <button class="text-btn" id="otp-cancel-btn">GERİ</button>
+                </div>
+            </div>
+
+            <!-- Bet Modal -->
+            <div id="bet-modal" class="modal-box app-dialog">
+                <h2 class="dialog-title">Mərc Artır</h2>
+                <div class="dialog-content">
+                    <p id="bet-modal-hint" class="hint-text" style="font-size: 14px; margin-bottom: 10px;"></p>
+                    <input type="number" id="bet-input" class="app-input" placeholder="Məbləğ" step="0.01">
+                </div>
+                <div class="dialog-footer">
+                    <button class="app-btn green" id="bet-submit-btn">GÖNDƏR</button>
+                    <button class="text-btn" id="bet-cancel-btn">LƏĞV ET</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
