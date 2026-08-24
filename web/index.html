@@ -2,13 +2,26 @@
 <html lang="az">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, minimal-ui">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.json">
     <title>3 Tuz - Web</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
 <body>
     <div id="app">
+        <!-- 0. MAINTENANCE SCREEN -->
+        <div id="maintenance-screen" class="screen">
+            <div class="maintenance-box">
+                <div class="build-icon">🛠️</div>
+                <h2>Serverdə təmir işləri gedir</h2>
+                <p>Narahatçılığa görə üzr istəyirik. 5 dəqiqədən sonra bir də cəhd edin.</p>
+            </div>
+        </div>
+
         <!-- 1. GİRİŞ EKRANI -->
         <div id="login-screen" class="screen active">
             <div class="login-box">
@@ -16,6 +29,7 @@
                 <input type="text" id="username" placeholder="İstifadəçi adı">
                 <input type="password" id="password" placeholder="Şifrə">
                 <button id="login-btn">GİRİŞ</button>
+                <a href="https://github.com/trumpr/3Tuza/releases/download/v1.0.0/3tuz.apk" id="download-apk-btn" class="download-link" download>Android üçün YÜKLƏ (APK)</a>
                 <p id="error-msg" class="error"></p>
                 <a href="#" id="go-to-register">Hesabınız yoxdur? Qeydiyyatdan keçin</a>
             </div>
@@ -50,21 +64,21 @@
             </div>
             <div class="game-cards-container">
                 <div class="game-card" id="btn-3tuz">
-                    <img src="../app/src/main/res/drawable/kartseka.jpg" alt="3 Tuz">
+                    <img src="./images/kartseka.jpg" alt="3 Tuz">
                     <div class="card-content">
                         <h3>3 TUZ</h3>
                         <p>İndi Oyna</p>
                     </div>
                 </div>
                 <div class="game-card" id="btn-aviator">
-                    <img src="../app/src/main/res/drawable/aviatorsekil.png" alt="Aviator">
+                    <img src="./images/aviatorsekil.png" alt="Aviator">
                     <div class="card-content">
                         <h3>AVIATOR</h3>
                         <p>İndi Oyna</p>
                     </div>
                 </div>
                 <div class="game-card locked">
-                    <img src="../app/src/main/res/drawable/nard.jpg" alt="Nard">
+                    <img src="./images/nard.jpg" alt="Nard">
                     <div class="card-content">
                         <h3>NARD</h3>
                         <p>Tezliklə</p>
@@ -99,11 +113,11 @@
             <div class="table-container">
                 <div id="pot-container">
                     <div id="pot-coins-pile">
-                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
-                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
-                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
-                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
-                        <img src="../app/src/main/res/drawable/monet.jpg" class="pile-coin">
+                        <img src="./images/monet.jpg" class="pile-coin">
+                        <img src="./images/monet.jpg" class="pile-coin">
+                        <img src="./images/monet.jpg" class="pile-coin">
+                        <img src="./images/monet.jpg" class="pile-coin">
+                        <img src="./images/monet.jpg" class="pile-coin">
                     </div>
                     <span id="pot-amount">0.00 ₼</span>
                 </div>

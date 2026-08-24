@@ -1,3 +1,8 @@
+// Service Worker Qeydiyyatı
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW xətası:', err));
+}
+
 let socket = null;
 let currentUsername = "";
 let userBalance = 0;
@@ -25,17 +30,17 @@ let tyomnuInterval = null;
 
 // 0. Səslər
 const sounds = {
-    card: new Audio("../app/src/main/res/raw/card_sound.mp3"),
-    money: new Audio("../app/src/main/res/raw/money.mp3"),
-    bank: new Audio("../app/src/main/res/raw/bank.mp3"),
-    pas: new Audio("../app/src/main/res/raw/pas.mp3"),
-    open: new Audio("../app/src/main/res/raw/open.mp3"),
-    win: new Audio("../app/src/main/res/raw/win.mp3"),
-    meglub: new Audio("../app/src/main/res/raw/meglub.mp3"),
-    seka: new Audio("../app/src/main/res/raw/seka.mp3"),
-    tyomnu: new Audio("../app/src/main/res/raw/tyomnu.mp3"),
-    patyomnu: new Audio("../app/src/main/res/raw/patyomnu.mp3"),
-    pulbolundu: new Audio("../app/src/main/res/raw/pulbolundu.mp3")
+    card: new Audio("./sounds/card_sound.mp3"),
+    money: new Audio("./sounds/money.mp3"),
+    bank: new Audio("./sounds/bank.mp3"),
+    pas: new Audio("./sounds/pas.mp3"),
+    open: new Audio("./sounds/open.mp3"),
+    win: new Audio("./sounds/win.mp3"),
+    meglub: new Audio("./sounds/meglub.mp3"),
+    seka: new Audio("./sounds/seka.mp3"),
+    tyomnu: new Audio("./sounds/tyomnu.mp3"),
+    patyomnu: new Audio("./sounds/patyomnu.mp3"),
+    pulbolundu: new Audio("./sounds/pulbolundu.mp3")
 };
 
 function playSound(name) {
@@ -46,7 +51,7 @@ function playSound(name) {
 }
 
 function getCardFileName(card) {
-    if (!card || card === "back") return "../app/src/main/res/drawable/card_back.png";
+    if (!card || card === "back") return "images/card_back.png";
     const valueStr = card.substring(0, card.length - 1);
     const suitChar = card.slice(-1);
 
@@ -56,19 +61,45 @@ function getCardFileName(card) {
     else if (v === "Q") v = "12";
     else if (v === "J") v = "11";
 
-    const s = { "♣": "c", "♦": "d", "♥": "h", "♠": "s" }[suitChar] || "back";
-    return `../app/src/main/res/drawable/card_${v}_${s}.png`;
+    const s = {
+        "\u2663": "c", "\u2666": "d", "\u2665": "h", "\u2660": "s",
+        "♣": "c", "♦": "d", "♥": "h", "♠": "s"
+    }[suitChar] || "back";
+
+    return `images/card_${v}_${s}.png`;
 }
 
-// 1. URL oxuma
+// 1. URL oxuma (Android AppConfig.kt məntiqi ilə eyni)
+const ENCODED_LINK = "aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3RydW1wci9tZXRuL21haW4vdXJsLnR4dA==";
+
 async function fetchServerUrl() {
     try {
-        const response = await fetch("https://raw.githubusercontent.com/trumpr/metn/main/url.txt");
-        let url = await response.text();
-        url = url.trim();
-        serverUrl = url.startsWith("http") ? url : "https://" + url;
-        if (!serverUrl.endsWith("/")) serverUrl += "/";
-    } catch (e) { alert("Xəta: URL oxunmadı"); }
+        // Base64 decoding (atob)
+        const urlToFetch = atob(ENCODED_LINK);
+
+        const response = await fetch(urlToFetch);
+        let rawUrl = await response.text();
+        rawUrl = rawUrl.trim();
+
+        // Təmir rejimi yoxlanışı
+        if (rawUrl === "TEMIR" || rawUrl === "MAINTENANCE") {
+            showScreen("maintenance-screen");
+            return false;
+        }
+
+        if (rawUrl) {
+            let url = rawUrl;
+            if (!url.startsWith("http")) {
+                url = "https://" + url;
+            }
+            serverUrl = url.endsWith("/") ? url : url + "/";
+            return true;
+        }
+    } catch (e) {
+        console.error("URL oxunmadı:", e);
+        alert("Server bağlantısı qurulmadı. İnterneti yoxlayın.");
+    }
+    return false;
 }
 
 // 2. Navigation
@@ -499,7 +530,10 @@ function calculateGameScore(hand) {
         return parseInt(rank) || 0;
     }
 
-    const suits = { "♣": 0, "♦": 0, "♥": 0, "♠": 0 };
+    const suits = {
+        "\u2663": 0, "\u2666": 0, "\u2665": 0, "\u2660": 0,
+        "♣": 0, "♦": 0, "♥": 0, "♠": 0
+    };
     hand.forEach(c => {
         const s = c.slice(-1);
         suits[s] = (suits[s] || 0) + getCardValue(c);
@@ -547,7 +581,7 @@ function updateTableUI(players) {
     const radiusX = screenW * 0.35;
     const radiusY = screenH * 0.18;
     const centerX = screenW / 2;
-    const centerY = screenH * 0.40;
+    const centerY = screenH * 0.45; // 0.40-dan 0.45-ə (aşağı salındı)
 
     players.forEach((p, i) => {
         if(!p || !p.username) return;
@@ -625,7 +659,7 @@ function animateCoin(username, amount, type) {
 
     // Center position
     const cX = containerRect.width / 2;
-    const cY = containerRect.height * 0.40; // Pot center
+    const cY = containerRect.height * 0.45; // Pot mərkəzi ilə eyni (aşağı salındı)
 
     const coin = document.createElement("div");
     coin.className = `flying-coin ${type === "BET" ? "coin-bet" : "coin-win"}`;
@@ -635,7 +669,7 @@ function animateCoin(username, amount, type) {
     coin.style.setProperty("--center-y", cY + "px");
 
     coin.innerHTML = `
-        <img src="../app/src/main/res/drawable/monet.jpg" style="width:100%; height:auto; border-radius:50%;">
+        <img src="./images/monet.jpg" style="width:100%; height:auto; border-radius:50%;">
         <div class="coin-amount-tag">${type === "BET" ? "-" : "+"}${amount.toFixed(2)} ₼</div>
     `;
 
@@ -1329,7 +1363,9 @@ document.getElementById("btn-seka").onclick = () => {
 document.getElementById("btn-3tuz").onclick = () => showScreen("lobby-screen");
 
 async function init() {
-    await fetchServerUrl();
+    const success = await fetchServerUrl();
+    if (!success) return; // Təmir rejimindədirsə və ya xəta varsa davam etmə
+
     initPeekEvents();
 
     // Yadda saxlanılmış məlumatları yoxla
