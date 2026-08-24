@@ -34,17 +34,17 @@ let tyomnuInterval = null;
 
 // 0. Səslər
 const sounds = {
-    card: new Audio("web/sounds/card_sound.mp3"),
-    money: new Audio("web/sounds/money.mp3"),
-    bank: new Audio("web/sounds/bank.mp3"),
-    pas: new Audio("web/sounds/pas.mp3"),
-    open: new Audio("web/sounds/open.mp3"),
-    win: new Audio("web/sounds/win.mp3"),
-    meglub: new Audio("web/sounds/meglub.mp3"),
-    seka: new Audio("web/sounds/seka.mp3"),
-    tyomnu: new Audio("web/sounds/tyomnu.mp3"),
-    patyomnu: new Audio("web/sounds/patyomnu.mp3"),
-    pulbolundu: new Audio("web/sounds/pulbolundu.mp3")
+    card: new Audio("sounds/card_sound.mp3"),
+    money: new Audio("sounds/money.mp3"),
+    bank: new Audio("sounds/bank.mp3"),
+    pas: new Audio("sounds/pas.mp3"),
+    open: new Audio("sounds/open.mp3"),
+    win: new Audio("sounds/win.mp3"),
+    meglub: new Audio("sounds/meglub.mp3"),
+    seka: new Audio("sounds/seka.mp3"),
+    tyomnu: new Audio("sounds/tyomnu.mp3"),
+    patyomnu: new Audio("sounds/patyomnu.mp3"),
+    pulbolundu: new Audio("sounds/pulbolundu.mp3")
 };
 
 function playSound(name) {
@@ -55,7 +55,7 @@ function playSound(name) {
 }
 
 function getCardFileName(card) {
-    if (!card || card === "back") return "web/images/card_back.png";
+    if (!card || card === "back") return "images/card_back.png";
     const valueStr = card.substring(0, card.length - 1);
     const suitChar = card.slice(-1);
 
@@ -70,7 +70,7 @@ function getCardFileName(card) {
         "♣": "c", "♦": "d", "♥": "h", "♠": "s"
     }[suitChar] || "back";
 
-    return `web/images/card_${v}_${s}.png`;
+    return `images/card_${v}_${s}.png`;
 }
 
 // 1. URL oxuma (Android AppConfig.kt məntiqi ilə eyni)
@@ -673,7 +673,7 @@ function animateCoin(username, amount, type) {
     coin.style.setProperty("--center-y", cY + "px");
 
     coin.innerHTML = `
-        <img src="web/images/monet.jpg" style="width:100%; height:auto; border-radius:50%;">
+        <img src="images/monet.jpg" style="width:100%; height:auto; border-radius:50%;">
         <div class="coin-amount-tag">${type === "BET" ? "-" : "+"}${amount.toFixed(2)} ₼</div>
     `;
 

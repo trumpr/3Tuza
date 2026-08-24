@@ -34,17 +34,17 @@ let tyomnuInterval = null;
 
 // 0. Səslər
 const sounds = {
-    card: new Audio("./sounds/card_sound.mp3"),
-    money: new Audio("./sounds/money.mp3"),
-    bank: new Audio("./sounds/bank.mp3"),
-    pas: new Audio("./sounds/pas.mp3"),
-    open: new Audio("./sounds/open.mp3"),
-    win: new Audio("./sounds/win.mp3"),
-    meglub: new Audio("./sounds/meglub.mp3"),
-    seka: new Audio("./sounds/seka.mp3"),
-    tyomnu: new Audio("./sounds/tyomnu.mp3"),
-    patyomnu: new Audio("./sounds/patyomnu.mp3"),
-    pulbolundu: new Audio("./sounds/pulbolundu.mp3")
+    card: new Audio("sounds/card_sound.mp3"),
+    money: new Audio("sounds/money.mp3"),
+    bank: new Audio("sounds/bank.mp3"),
+    pas: new Audio("sounds/pas.mp3"),
+    open: new Audio("sounds/open.mp3"),
+    win: new Audio("sounds/win.mp3"),
+    meglub: new Audio("sounds/meglub.mp3"),
+    seka: new Audio("sounds/seka.mp3"),
+    tyomnu: new Audio("sounds/tyomnu.mp3"),
+    patyomnu: new Audio("sounds/patyomnu.mp3"),
+    pulbolundu: new Audio("sounds/pulbolundu.mp3")
 };
 
 function playSound(name) {
@@ -673,7 +673,7 @@ function animateCoin(username, amount, type) {
     coin.style.setProperty("--center-y", cY + "px");
 
     coin.innerHTML = `
-        <img src="./images/monet.jpg" style="width:100%; height:auto; border-radius:50%;">
+        <img src="images/monet.jpg" style="width:100%; height:auto; border-radius:50%;">
         <div class="coin-amount-tag">${type === "BET" ? "-" : "+"}${amount.toFixed(2)} ₼</div>
     `;
 

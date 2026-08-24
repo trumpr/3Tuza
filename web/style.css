@@ -169,7 +169,7 @@ body {
 
 /* Game Screen */
 #game-screen {
-    background-image: url('./images/table.png');
+    background-image: url('images/table.png');
     background-size: cover;
     background-position: center;
     touch-action: none;
