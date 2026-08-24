@@ -1,6 +1,10 @@
-// Service Worker Qeydiyyatı
+// Service Worker-i ləğv et (Yükləmə xətalarını aradan qaldırmaq üçün)
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(err => console.log('SW xətası:', err));
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) {
+            registration.unregister();
+        }
+    });
 }
 
 let socket = null;
