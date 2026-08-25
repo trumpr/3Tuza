@@ -1028,6 +1028,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const openBtn = document.getElementById("open-user-panel-btn");
     if(openBtn) openBtn.onclick = () => showUserPanel();
+
+    // WhatsApp Paylaş düyməsi
+    const shareWhatsappBtn = document.getElementById("share-whatsapp-btn");
+    if (shareWhatsappBtn) {
+        shareWhatsappBtn.onclick = () => {
+            const currentUrl = window.location.href;
+            const text = "3 Tuz Online oyununa qoşul! " + currentUrl;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(whatsappUrl, '_blank');
+        };
+    }
 });
 
 function showTopupModal(text) {
